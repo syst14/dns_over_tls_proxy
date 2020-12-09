@@ -1,6 +1,11 @@
 import SocketServer
 import socket
 import ssl
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(name)s: %(message)s',
+                    )
 
 
 def tcp_connection_to(DNS_HOST):
@@ -39,6 +44,10 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
 
+        # logging new requests
+        self.logger = logging.getLogger('New request')
+        self.logger.debug('client %s DNS requested %s', self.request.getpeername(), self.data)
+
         #Save dns proxy result
         res = dns_proxy(self.data, DNS_HOST)
 
@@ -47,7 +56,12 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
 if __name__ == "__main__":
     DNS_HOST, DNS_PORT = "1.1.1.1", 853
-    HOST, PORT = "10.10.10.2", 53
+    HOST, PORT = "0.0.0.0", 53
+
+    # logging server init
+    logger = logging.getLogger('App')
+    logger.info('Server on %s:%s', HOST, PORT)
+    logger.info('DNP provider is %s:%s', DNS_HOST, DNS_PORT)
 
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
     server.serve_forever()
