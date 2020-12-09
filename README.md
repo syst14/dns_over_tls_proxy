@@ -12,26 +12,18 @@ and return dns query result back to TCPHandler.
 HOW TO RUN
 -------------
 
-* Pre-conditions: Docker installed.
+* Pre-conditions: Docker and docker-compose (>1.18.0) installed.
 
 This proxy was designed as containerized service.
 Clone source code to separate folder and run commands below in same folder.
-Let's build docker image -
+One button deploy -
 ```
-docker build -t dot-proxy .
-```
-Then create separate network for it -
-```
-docker network create --subnet 10.10.10.0/24 dot_proxy_network
-```
-And run container with proxy
-```
-docker run -d --net dot_proxy_network --name dns_over_tls_proxy dot-proxy
+docker-compose up -d --build
 ```
 
 Now you could test it with dig (one if the most popular dns query tool):
 ```
-dig @10.10.10.2 -p 53 n26.com +tcp
+dig @localhost -p 8053 n26.com +tcp
 ```
 
 Security concerns:
